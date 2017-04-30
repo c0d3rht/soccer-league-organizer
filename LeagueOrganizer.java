@@ -31,6 +31,5 @@ public class LeagueOrganizer {
         Players.saveTo(assistant, SAVE_FILE);
 
         // TODO: D.R.Y. promptData() and promptPlayer(), and try to merge them
-
     }
 }

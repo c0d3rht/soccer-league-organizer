@@ -214,7 +214,7 @@ public class Assistant {
 
     // Prompt for team
     private List<Player> promptTeam(String func) {
-        if (!(mTeams == null)) {
+        if (mTeams != null) {
             String string = "";
             int input = 0;
 
@@ -282,10 +282,10 @@ public class Assistant {
     private Object promptData(String type, String func) {
         List<Player> players = promptTeam(func);
 
-        if (!(players == null || players.size() == 0)) {
+        if (players != null || players.size() != 0) {
             if (type.equals("team")) {
                 for (Team team : mTeams) {
-                    if (team.getPlayers().containsAll(players)) {
+                    if (team.getPlayers().containsAll(players) && team.getPlayers().size() == players.size()) {
                         actionTowards = team.getName();
                         return team;
                     }
@@ -372,18 +372,26 @@ public class Assistant {
             System.out.printf("Where do you want to send %s to?%n%n", player);
             Object data = promptData("team", "add");
 
-            if (!actionTowards.equals("Waiting List")) {
-                Team team = (Team) data;
+            if (data != null) {
+                if (!actionTowards.equals("Waiting List")) {
+                    Team team = (Team) data;
 
-                if (team.size() < Team.MAX_PLAYERS) {
-                    team.add(player);
-                    System.out.printf("%n%s, %s is added!", player.getLastName(), player.getFirstName());
+                    if (team.size() < Team.MAX_PLAYERS) {
+                        for (Team other : mTeams) {
+                            if (other.equals(team)) {
+                                other.add(player);
+                                break;
+                            }
+                        }
+
+                        System.out.printf("%n%s, %s is added!", player.getLastName(), player.getFirstName());
+                    } else {
+                        System.out.printf("%nERROR: Cannot exceed limit of %d players.%n", Team.MAX_PLAYERS);
+                    }
                 } else {
-                    System.out.printf("%nERROR: Cannot exceed limit of %d players.%n", Team.MAX_PLAYERS);
+                    mWaitingList.add(player);
+                    System.out.printf("%n%s, %s is added!", player.getLastName(), player.getFirstName());
                 }
-            } else {
-                mWaitingList.add(player);
-                System.out.printf("%n%s, %s is added!", player.getLastName(), player.getFirstName());
             }
         }
     }
